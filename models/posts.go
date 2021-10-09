@@ -1,3 +1,4 @@
+//this is the model used for posts information
 package models
 
 import "gopkg.in/mgo.v2/bson"

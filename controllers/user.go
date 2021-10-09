@@ -1,3 +1,8 @@
+// This file contain all the functions related to user
+// 1.Getting User information
+// 2.Creating User
+// 3.Deleting User
+
 package controllers
 
 import (
@@ -19,23 +24,25 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
-func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	id := p.ByName("id")
+//In GetUser,this function will get the user from mongoDB with respective the entered user id.
 
+func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	id := p.ByName("id")
 	if !bson.IsObjectIdHex(id) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
 	oid := bson.ObjectIdHex(id)
 
-	u := models.User{}
+	userInfo := models.User{}
 
-	if err := uc.session.DB("mongo-golang").C("users").FindId(oid).One(&u); err != nil {
+	if err := uc.session.DB("mongo-golang").C("users").FindId(oid).One(&userInfo); err != nil {
 		w.WriteHeader(404)
 		return
 	}
 
-	uj, err := json.Marshal(u)
+	uj, err := json.Marshal(userInfo)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -46,16 +53,18 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 }
 
+//In CreateUser, this function will create and store a new user in mongoDb.
+
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u := models.User{}
+	userInfo := models.User{}
 
-	json.NewDecoder(r.Body).Decode(&u)
+	json.NewDecoder(r.Body).Decode(&userInfo)
 
-	u.Id = bson.NewObjectId()
+	userInfo.Id = bson.NewObjectId()
 
-	uc.session.DB("mongo-golang").C("users").Insert(u)
+	uc.session.DB("mongo-golang").C("users").Insert(userInfo)
 
-	uj, err := json.Marshal(u)
+	uj, err := json.Marshal(userInfo)
 
 	if err != nil {
 		fmt.Println(err)
@@ -65,8 +74,9 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ ht
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "%s\n", uj)
 
-	// fmt.Println("hello world") 61615b065f92d451cc553fee 61615b405f92d451cc553fef
 }
+
+//In DeleteUser, this function will delete user in mongoDb with respect to the given user id.
 
 func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 

@@ -1,3 +1,4 @@
+//This is the model used for users information
 package models
 
 import "gopkg.in/mgo.v2/bson"
