@@ -1,5 +1,7 @@
 # go-mongo-api
 
+Made a social media api for the task given by appointy.
+
 ## Included
 * GET post and user
 * CREATE post and user
